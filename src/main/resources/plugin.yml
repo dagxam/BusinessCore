@@ -7,8 +7,6 @@ author: BusinessCore
 softdepend:
   - PlaceholderAPI
   - LuckPerms
-  - DeluxeMenus
-  - TAB
   - SkinsRestorer
 
 commands:
