@@ -6,6 +6,21 @@
 prefix: "&6&l[Server]&r"
 currency-symbol: "₽"
 
+# Chat formatting (BusinessCore handles placeholders itself)
+chat:
+  enabled: true
+  # Available placeholders: %gender_prefix% %rank_name% %rank_prefix% %player_name% %skript_balance% %message%
+  format: "%gender_prefix% %rank_prefix%&f%player_name%&7: &f%message%"
+
+# Player list (TAB)
+tab:
+  enabled: true
+  update-interval-seconds: 2
+  # Prefix shown before player name in the TAB list
+  prefix: "%gender_prefix% %rank_prefix%"
+  # Suffix shown after player name in the TAB list
+  suffix: " &7| &6%skript_balance%%currency%"
+
 # ─── Economy ───
 start-money: 100
 baltop-limit: 10
@@ -51,62 +66,15 @@ ranks:
   minister:
     points: 750
     display: "&5&lМинистр"
-
-# ─── Group priority (highest first) ───
-group-priority:
-  - "president"
-  - "prime_minister"
-  - "minister"
-  - "inspector"
-  - "military"
-  - "official"
-  - "police"
-  - "worker"
-  - "resident"
-
-# ─── Skins per group/gender ───
-skins:
-  president:
-    male: "PresidentMale"
-    female: "PresidentFemale"
   prime_minister:
-    male: "PrimeMale"
-    female: "PrimeFemale"
-  minister:
-    male: "MinisterMale"
-    female: "MinisterFemale"
-  inspector:
-    male: "InspectorMale"
-    female: "InspectorFemale"
-  military:
-    male: "MilitaryMale"
-    female: "MilitaryFemale"
-  official:
-    male: "OfficialMale"
-    female: "OfficialFemale"
-  police:
-    male: "PoliceMale"
-    female: "PoliceFemale"
-  worker:
-    male: "WorkerMale"
-    female: "WorkerFemale"
-  resident:
-    male: "ResidentMale"
-    female: "ResidentFemale"
-  default:
-    male: "Steve"
-    female: "Alex"
+    points: 1000
+    display: "&d&lПремьер-министр"
+  president:
+    points: 1500
+    display: "&c&lПрезидент"
 
-# ─── Mob point rewards ───
+# ─── Mining/kill points ───
 mob-points:
-  # Bosses
-  wither: 5
-  ender_dragon: 10
-  warden: 5
-  elder_guardian: 3
-  # Player kill
-  player: 10
-  # Mobs 1 point per 1 kill
   skeleton: 1
   stray: 1
   wither_skeleton: 1
