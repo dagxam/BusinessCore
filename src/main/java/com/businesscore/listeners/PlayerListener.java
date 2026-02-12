@@ -3,8 +3,6 @@ package com.businesscore.listeners;
 import com.businesscore.BusinessCore;
 import com.businesscore.managers.DataManager;
 import com.businesscore.managers.EconomyManager;
-import com.businesscore.managers.GenderManager;
-import com.businesscore.managers.RankManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -59,14 +57,6 @@ public class PlayerListener implements Listener {
             }, 20L);
         }
 
-        // Initialize points
-        // (already 0 by default in DataManager)
-
-        // Initialize rank
-        if (dm.getRank(uuid).equals("default") && dm.getPoints(uuid) > 0) {
-            // Will be corrected by checkRankUp
-        }
-
         // OP state for TAB fix
         dm.setOpState(uuid, player.isOp() ? 1 : 0);
 
@@ -83,6 +73,13 @@ public class PlayerListener implements Listener {
                 plugin.getGenderManager().setSkinByGroup(player);
             }
         }, 60L);
+
+        // Render TAB shortly after join (needs rank/gender loaded)
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline()) {
+                plugin.getTabManager().updatePlayer(player);
+            }
+        }, 40L);
     }
 
     @EventHandler
@@ -90,6 +87,9 @@ public class PlayerListener implements Listener {
         String uuid = event.getPlayer().getUniqueId().toString();
         plugin.getDataManager().removeOpState(uuid);
         genderCooldown.remove(event.getPlayer().getUniqueId());
+
+        // Clean up open menu session
+        plugin.getMenuManager().clearOpenSession(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
