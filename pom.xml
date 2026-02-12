@@ -1,62 +1,154 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║          BusinessCore — Конфигурация сборки Maven           ║
+  ║                                                              ║
+  ║  Плагин для Minecraft 1.21.1 (Paper)                        ║
+  ║  Системы: Экономика, Магазин, Ранги, Очки, Пол, Скины       ║
+  ║                                                              ║
+  ║  Сборка: mvn clean package                                   ║
+  ║  Результат: target/BusinessCore-1.0.0.jar                   ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.businesscore</groupId>
-    <artifactId>BusinessCore</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
+    <!-- ═══════════════════════════════════════ -->
+    <!--         ОСНОВНАЯ ИНФОРМАЦИЯ             -->
+    <!-- ═══════════════════════════════════════ -->
+    <groupId>com.businesscore</groupId>          <!-- Группа проекта -->
+    <artifactId>BusinessCore</artifactId>        <!-- Название артефакта -->
+    <version>1.0.0</version>                     <!-- Версия плагина -->
+    <packaging>jar</packaging>                   <!-- Тип сборки: JAR-файл -->
 
     <name>BusinessCore</name>
-    <description>Economy, Ranks, Gender, Shop — all in one</description>
+    <description>
+        Единый плагин сервера: Экономика, Магазин, Система рангов,
+        Очки, Выбор пола, Автоскины
+    </description>
 
+    <!-- ═══════════════════════════════════════ -->
+    <!--         НАСТРОЙКИ ПРОЕКТА               -->
+    <!-- ═══════════════════════════════════════ -->
     <properties>
+        <!-- Версия Java (для Minecraft 1.21.1 нужна Java 21) -->
         <java.version>21</java.version>
+
+        <!-- Кодировка исходных файлов -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Версии зависимостей (удобно менять в одном месте) -->
+        <paper.version>1.21.1-R0.1-SNAPSHOT</paper.version>
+        <placeholderapi.version>2.11.6</placeholderapi.version>
+        <luckperms.version>5.4</luckperms.version>
     </properties>
 
+    <!-- ═══════════════════════════════════════ -->
+    <!--         РЕПОЗИТОРИИ (откуда качать)      -->
+    <!-- ═══════════════════════════════════════ -->
     <repositories>
+        <!-- PaperMC — ядро сервера Paper -->
         <repository>
             <id>papermc</id>
+            <name>PaperMC Repository</name>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+
+        <!-- PlaceholderAPI — плейсхолдеры -->
         <repository>
             <id>placeholderapi</id>
+            <name>PlaceholderAPI Repository</name>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+
+        <!-- Sonatype — для LuckPerms и других библиотек -->
+        <repository>
+            <id>sonatype-snapshots</id>
+            <name>Sonatype Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </repository>
     </repositories>
 
+    <!-- ═══════════════════════════════════════ -->
+    <!--         ЗАВИСИМОСТИ (библиотеки)        -->
+    <!-- ═══════════════════════════════════════ -->
     <dependencies>
-        <!-- Paper API 1.21.1 -->
+
+        <!--
+            ┌─────────────────────────────────┐
+            │  Paper API 1.21.1               │
+            │  Ядро сервера (ОБЯЗАТЕЛЬНО)      │
+            │  scope: provided — уже есть     │
+            │  на сервере, не включаем в JAR   │
+            └─────────────────────────────────┘
+        -->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.1-R0.1-SNAPSHOT</version>
+            <version>${paper.version}</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- PlaceholderAPI -->
+        <!--
+            ┌─────────────────────────────────┐
+            │  PlaceholderAPI                  │
+            │  Для плейсхолдеров:             │
+            │  %businesscore_money%            │
+            │  %businesscore_points%           │
+            │  %businesscore_gender%           │
+            │  scope: provided                │
+            └─────────────────────────────────┘
+        -->
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.11.6</version>
+            <version>${placeholderapi.version}</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- LuckPerms API -->
+        <!--
+            ┌─────────────────────────────────┐
+            │  LuckPerms API                  │
+            │  Для управления:                │
+            │  - рангами (parent set)         │
+            │  - правами (permission set)     │
+            │  - префиксами (meta setprefix)  │
+            │  scope: provided                │
+            └─────────────────────────────────┘
+        -->
         <dependency>
             <groupId>net.luckperms</groupId>
             <artifactId>api</artifactId>
-            <version>5.4</version>
+            <version>${luckperms.version}</version>
             <scope>provided</scope>
         </dependency>
+
     </dependencies>
 
+    <!-- ═══════════════════════════════════════ -->
+    <!--         НАСТРОЙКИ СБОРКИ                -->
+    <!-- ═══════════════════════════════════════ -->
     <build>
+        <!-- Имя итогового JAR-файла -->
+        <finalName>${project.name}-${project.version}</finalName>
+
+        <!-- Подключаем ресурсы (plugin.yml, config.yml) -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering> <!-- Подставляет ${project.version} в plugin.yml -->
+            </resource>
+        </resources>
+
         <plugins>
+            <!--
+                Компилятор Java
+                Собирает .java файлы в .class
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -64,8 +156,15 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+
+            <!--
+                Shade Plugin
+                Упаковывает все нужные классы в один JAR
+                (на случай если добавите внешние библиотеки)
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -73,16 +172,45 @@
                 <executions>
                     <execution>
                         <phase>package</phase>
-                        <goals><goal>shade</goal></goals>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Убираем лишние файлы из JAR -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <!--
+                JAR Plugin
+                Дополнительные настройки JAR-файла
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Built-By>BusinessCore</Built-By>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
+
 </project>
