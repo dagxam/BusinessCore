@@ -1,0 +1,146 @@
+name: BusinessCore
+version: '1.0.0'
+main: com.businesscore.BusinessCore
+api-version: '1.21'
+description: "Economy, Ranks, Gender, Shop — all in one"
+author: BusinessCore
+softdepend:
+  - PlaceholderAPI
+  - LuckPerms
+  - DeluxeMenus
+  - TAB
+  - SkinsRestorer
+
+commands:
+  # === Economy ===
+  setmoney:
+    description: Set player balance
+    permission: money.admin
+    usage: /setmoney <player> <amount>
+  addmoney:
+    description: Add money to player
+    permission: money.admin
+    usage: /addmoney <player> <amount>
+  takemoney:
+    description: Take money from player
+    permission: money.admin
+    usage: /takemoney <player> <amount>
+  balance:
+    description: Check balance
+    aliases: [bal, money]
+    usage: /balance [player]
+  pay:
+    description: Pay another player
+    usage: /pay <player> <amount>
+  baltop:
+    description: Top richest players
+    aliases: [moneytop]
+    usage: /baltop
+
+  # === Shop ===
+  shop_vip:
+    description: Open VIP shop
+  shop_lum:
+    description: Open lumber shop
+  shop_mine:
+    description: Open mining shop
+  shop_farm:
+    description: Open farm shop
+  sell:
+    description: Sell item in hand
+    usage: /sell [amount]
+  skript-buy:
+    description: Buy item from menu
+    permission: skript.shop.use
+  skript-sell:
+    description: Sell item from menu
+    permission: skript.shop.use
+  skript-sellall:
+    description: Sell all items from menu
+    permission: skript.shop.use
+  skript-buyhealth:
+    description: Buy health
+    permission: skript.shop.use
+  skript-buyexp:
+    description: Buy experience
+    permission: skript.shop.use
+  skript-buylevel:
+    description: Buy levels
+    permission: skript.shop.use
+  skript-buypoints:
+    description: Buy rank points
+    permission: skript.shop.use
+  skript-buy-upgradebook:
+    description: Buy enchanted book
+    permission: skript.shop.use
+  skript-sell-upgradebook:
+    description: Sell enchanted book
+    permission: skript.shop.use
+
+  # === Ranks/Points ===
+  mypoints:
+    description: Check your points
+    aliases: [points, "очки"]
+  checkpoints:
+    description: Check player points
+    permission: op
+    usage: /checkpoints <player>
+  addpoints:
+    description: Add points to player
+    permission: op
+    usage: /addpoints <player> <amount>
+  setpoints:
+    description: Set player points
+    permission: op
+    usage: /setpoints <player> <amount>
+  resetpoints:
+    description: Reset player points
+    permission: op
+    usage: /resetpoints <player>
+  ranklist:
+    description: Show rank list
+
+  # === Gender ===
+  selectgender:
+    description: Select gender
+    usage: /selectgender <male/female>
+  gendermenu:
+    description: Open gender menu
+  mygender:
+    description: Check your gender
+  resetmygender:
+    description: Reset your gender
+    permission: gender.reset.self
+  resetgender:
+    description: Reset player gender
+    permission: gender.reset.other
+    usage: /resetgender <player>
+  updateskin:
+    description: Update skin by group
+    permission: gender.updateskin
+    usage: /updateskin [player]
+  genderskin:
+    description: Set skin for group
+    permission: gender.admin
+    usage: /genderskin <group> <male/female> <skinname>
+  genderconfig:
+    description: View skin config
+    permission: gender.admin
+
+  # === Migration ===
+  migratepoints:
+    description: Migrate old points data
+
+permissions:
+  money.admin:
+    default: op
+  skript.shop.use:
+    default: true
+  gender.reset.self:
+    default: false
+  gender.reset.other:
+    default: op
+  gender.updateskin:
+    default: op
+  gender.admin:
+    default: op
