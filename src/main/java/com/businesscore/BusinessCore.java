@@ -68,7 +68,7 @@ public class BusinessCore extends JavaPlugin {
         long skinUpdateTicks = getConfig().getInt("skin-update-interval-seconds", 30) * 20L;
         long tabUpdateTicks = getConfig().getInt("tab-update-interval-seconds", 2) * 20L;
 
-        new GenderCheckTask(this).runTaskTimer(this, 100L, genderCheckTicks);
+        
         new SkinUpdateTask(this).runTaskTimer(this, skinUpdateTicks, skinUpdateTicks);
         new TabUpdateTask(this).runTaskTimer(this, 40L, tabUpdateTicks);
         new OpStateFixTask(this).runTaskTimer(this, 100L, 40L);
