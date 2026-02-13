@@ -16,10 +16,19 @@ chat:
 tab:
   enabled: true
   update-interval-seconds: 2
-  # Prefix shown before player name in the TAB list
+
+  # то, что слева от ника
   prefix: "%gender_prefix% %rank_prefix%"
-  # Suffix shown after player name in the TAB list
-  suffix: " &7| &6%skript_balance%%currency%"
+
+  # то, что справа от ника (СВЕРХУ) -> ОЧКИ
+  suffix: " &7| &eОчки: &a%businesscore_points%"
+
+  # верх TAB (можешь оставить просто BUSINESSCORE)
+  header: "&6&lBUSINESSCORE"
+
+  # низ TAB (СНИЗУ) -> ДЕНЬГИ
+  footer: "&7Баланс: &6%skript_balance%%currency%"
+
 
 # ─── Economy ───
 start-money: 100
