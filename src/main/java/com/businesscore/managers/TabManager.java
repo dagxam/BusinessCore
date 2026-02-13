@@ -12,105 +12,91 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.businesscore.BusinessCore.color;
 
-/**
- * Lightweight TAB implementation (no TAB plugin required).
- * Shows gender + rank + money in the player list using scoreboard team prefix/suffix.
- */
 public class TabManager {
 
     private final BusinessCore plugin;
-    private final Scoreboard board;
-
-    // One team per player (stable name based on UUID hash; max 16 chars).
-    private final Map<UUID, String> teamNames = new ConcurrentHashMap<>();
+    private final Map<UUID, String> playerTeamNames = new ConcurrentHashMap<>();
 
     public TabManager(BusinessCore plugin) {
         this.plugin = plugin;
-        this.board = Bukkit.getScoreboardManager().getMainScoreboard();
     }
 
     public void updateAll() {
+        if (!plugin.getConfig().getBoolean("tab.enabled", true)) return;
         for (Player p : Bukkit.getOnlinePlayers()) {
             updatePlayer(p);
         }
     }
 
     public void updatePlayer(Player player) {
-        if (player == null) return;
+        if (!plugin.getConfig().getBoolean("tab.enabled", true)) return;
 
-        // Make sure player sees main scoreboard (teams affect TAB)
+        // ── Header/Footer (верх/низ TAB) ──
+        String header = plugin.getConfig().getString("tab.header", "&6&lBUSINESSCORE");
+        String footer = plugin.getConfig().getString("tab.footer", "&7Баланс: &6%skript_balance%%currency%");
+
+        header = plugin.replacePlaceholders(player, header);
+        footer = plugin.replacePlaceholders(player, footer);
+
+        // set header/footer (Spigot/Paper 1.21+ поддерживает)
         try {
-            player.setScoreboard(board);
+            player.setPlayerListHeaderFooter(color(header), color(footer));
         } catch (Throwable ignored) {
+            // если вдруг сборка сервера без метода — не падаем
         }
 
-        String teamName = teamNames.computeIfAbsent(player.getUniqueId(), this::makeTeamName);
-        Team team = board.getTeam(teamName);
-        if (team == null) {
-            team = board.registerNewTeam(teamName);
-        }
+        // ── Prefix/Suffix в строке игрока ──
+        Scoreboard sb = Bukkit.getScoreboardManager().getMainScoreboard();
+
+        String teamName = playerTeamNames.computeIfAbsent(player.getUniqueId(), u -> makeTeamName(player));
+        Team team = sb.getTeam(teamName);
+        if (team == null) team = sb.registerNewTeam(teamName);
+
+        String prefix = plugin.getConfig().getString("tab.prefix", "%gender_prefix% %rank_prefix%");
+        String suffix = plugin.getConfig().getString("tab.suffix", " &7| &e%businesscore_points%");
+
+        String rankPrefix = getRankPrefix(player);
+        String genderPrefix = getGenderPrefix(player);
+
+        prefix = prefix.replace("%rank_prefix%", rankPrefix).replace("%gender_prefix%", genderPrefix);
+        suffix = suffix.replace("%rank_prefix%", rankPrefix).replace("%gender_prefix%", genderPrefix);
+
+        prefix = plugin.replacePlaceholders(player, prefix);
+        suffix = plugin.replacePlaceholders(player, suffix);
+
+        team.setPrefix(color(cut(prefix, 64)));
+        team.setSuffix(color(cut(suffix, 64)));
 
         if (!team.hasEntry(player.getName())) {
-            // Remove from old teams (if player renamed teams)
-            for (Team t : board.getTeams()) {
-                if (t != team && t.hasEntry(player.getName())) {
-                    t.removeEntry(player.getName());
-                }
-            }
             team.addEntry(player.getName());
         }
+    }
 
-        String prefix = plugin.getConfig().getString(
-                "tab-prefix-format",
-                "%businesscore_gender% %businesscore_rank% &7"
-        );
-        String suffix = plugin.getConfig().getString(
-                "tab-suffix-format",
-                " &8| &e%skript_balance%" + plugin.getCurrencySymbol()
-        );
+    private String makeTeamName(Player player) {
+        String base = "bc" + Integer.toHexString(player.getUniqueId().hashCode());
+        if (base.length() > 16) base = base.substring(0, 16);
+        return base;
+    }
 
-        prefix = color(plugin.replacePlaceholders(player, prefix));
-        suffix = color(plugin.replacePlaceholders(player, suffix));
+    private String getGenderPrefix(Player p) {
+        if (p.hasPermission("gender.male")) return "&b&l♂";
+        if (p.hasPermission("gender.female")) return "&d&l♀";
+        return "&7?";
+    }
 
-        // Scoreboard prefix/suffix limits are implementation dependent; keep reasonably short.
-        if (prefix.length() > 64) prefix = prefix.substring(0, 64);
-        if (suffix.length() > 64) suffix = suffix.substring(0, 64);
+    private String getRankPrefix(Player p) {
+        String uuid = p.getUniqueId().toString();
+        String rankId = plugin.getDataManager().getRank(uuid);
+        String display = plugin.getConfig().getString("ranks." + rankId + ".display", rankId);
+        return display + " ";
+    }
 
-        team.setPrefix(prefix);
-        team.setSuffix(suffix);
-
-        // Optional header/footer
-        if (plugin.getConfig().getBoolean("tab-header-footer-enabled", true)) {
-            String header = plugin.getConfig().getString("tab-header", "&6&lBUSINESSCORE");
-            String footer = plugin.getConfig().getString("tab-footer", "&eБаланс: &6%skript_balance%" + plugin.getCurrencySymbol());
-
-            header = color(plugin.replacePlaceholders(player, header));
-            footer = color(plugin.replacePlaceholders(player, footer));
-
-            try {
-                player.setPlayerListHeaderFooter(header, footer);
-            } catch (Throwable ignored) {
-            }
-        }
+    private static String cut(String s, int max) {
+        if (s == null) return "";
+        return s.length() <= max ? s : s.substring(0, max);
     }
 
     public void shutdown() {
-        // Clean up our teams to avoid leaving junk after /reload.
-        for (String name : teamNames.values()) {
-            Team t = board.getTeam(name);
-            if (t != null) {
-                try {
-                    t.unregister();
-                } catch (Throwable ignored) {
-                }
-            }
-        }
-        teamNames.clear();
-    }
-
-    private String makeTeamName(UUID uuid) {
-        // 16 chars max. Example: bc_1a2b3c4d
-        String hex = uuid.toString().replace("-", "");
-        return ("bc_" + hex.substring(0, 8)).toLowerCase();
+        // nothing
     }
 }
