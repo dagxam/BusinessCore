@@ -31,19 +31,16 @@ public class TabManager {
     public void updatePlayer(Player player) {
         if (!plugin.getConfig().getBoolean("tab.enabled", true)) return;
 
-        // ── Header/Footer (верх/низ TAB) ──
-        String header = plugin.getConfig().getString("tab.header", "&6&lBUSINESSCORE");
-        String footer = plugin.getConfig().getString("tab.footer", "&7Баланс: &6%skript_balance%%currency%");
+        // ── Header/Footer (опционально) ──
+        String header = plugin.getConfig().getString("tab.header", "");
+        String footer = plugin.getConfig().getString("tab.footer", "");
 
         header = plugin.replacePlaceholders(player, header);
         footer = plugin.replacePlaceholders(player, footer);
 
-        // set header/footer (Spigot/Paper 1.21+ поддерживает)
         try {
             player.setPlayerListHeaderFooter(color(header), color(footer));
-        } catch (Throwable ignored) {
-            // если вдруг сборка сервера без метода — не падаем
-        }
+        } catch (Throwable ignored) {}
 
         // ── Prefix/Suffix в строке игрока ──
         Scoreboard sb = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -52,18 +49,31 @@ public class TabManager {
         Team team = sb.getTeam(teamName);
         if (team == null) team = sb.registerNewTeam(teamName);
 
-        String prefix = plugin.getConfig().getString("tab.prefix", "%gender_prefix% %rank_prefix%");
-        String suffix = plugin.getConfig().getString("tab.suffix", " &7| &e%businesscore_points%");
+        // Формат: [Ранг] Имя | Очки⭐ | Баланс💰
+        // prefix = "[Ранг] "
+        // suffix = " | Очки⭐ | Баланс💰"
+        String prefix = plugin.getConfig().getString("tab.prefix", "&7[%rank_name%&7] &f");
+        String suffix = plugin.getConfig().getString("tab.suffix",
+                " &7| &e%points%⭐ &7| &6%balance%💰");
 
-        String rankPrefix = getRankPrefix(player);
-        String genderPrefix = getGenderPrefix(player);
+        // rank display (то что у тебя в config ranks.<id>.display)
+        String rankName = getRankDisplay(player);
 
-        prefix = prefix.replace("%rank_prefix%", rankPrefix).replace("%gender_prefix%", genderPrefix);
-        suffix = suffix.replace("%rank_prefix%", rankPrefix).replace("%gender_prefix%", genderPrefix);
+        // points + balance (берём из DataManager/EconomyManager, не через плейсхолдеры, чтобы 100% работало)
+        String points = String.valueOf(plugin.getDataManager().getPoints(player.getUniqueId().toString()));
+        String balance = plugin.formatMoney(plugin.getEconomyManager().getBalance(player)) + plugin.getCurrencySymbol();
 
+        prefix = prefix.replace("%rank_name%", rankName);
+        suffix = suffix.replace("%rank_name%", rankName);
+
+        suffix = suffix.replace("%points%", points);
+        suffix = suffix.replace("%balance%", balance);
+
+        // на всякий случай — если где-то в конфиге стоят placeholders
         prefix = plugin.replacePlaceholders(player, prefix);
         suffix = plugin.replacePlaceholders(player, suffix);
 
+        // защита от длинных строк
         team.setPrefix(color(cut(prefix, 64)));
         team.setSuffix(color(cut(suffix, 64)));
 
@@ -78,17 +88,10 @@ public class TabManager {
         return base;
     }
 
-    private String getGenderPrefix(Player p) {
-        if (p.hasPermission("gender.male")) return "&b&l♂";
-        if (p.hasPermission("gender.female")) return "&d&l♀";
-        return "&7?";
-    }
-
-    private String getRankPrefix(Player p) {
+    private String getRankDisplay(Player p) {
         String uuid = p.getUniqueId().toString();
         String rankId = plugin.getDataManager().getRank(uuid);
-        String display = plugin.getConfig().getString("ranks." + rankId + ".display", rankId);
-        return display + " ";
+        return plugin.getConfig().getString("ranks." + rankId + ".display", rankId);
     }
 
     private static String cut(String s, int max) {
