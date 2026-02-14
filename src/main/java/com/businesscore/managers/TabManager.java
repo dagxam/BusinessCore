@@ -15,6 +15,8 @@ import static com.businesscore.BusinessCore.color;
 public class TabManager {
 
     private final BusinessCore plugin;
+
+    // per-player team name cache
     private final Map<UUID, String> playerTeamNames = new ConcurrentHashMap<>();
 
     public TabManager(BusinessCore plugin) {
@@ -31,7 +33,7 @@ public class TabManager {
     public void updatePlayer(Player player) {
         if (!plugin.getConfig().getBoolean("tab.enabled", true)) return;
 
-        // ── Header/Footer (опционально) ──
+        // ── (опционально) header/footer ──
         String header = plugin.getConfig().getString("tab.header", "");
         String footer = plugin.getConfig().getString("tab.footer", "");
 
@@ -42,38 +44,37 @@ public class TabManager {
             player.setPlayerListHeaderFooter(color(header), color(footer));
         } catch (Throwable ignored) {}
 
-        // ── Prefix/Suffix в строке игрока ──
+        // ── строка игрока: [Ранг] Имя | Очки⭐ | Баланс💰 ──
         Scoreboard sb = Bukkit.getScoreboardManager().getMainScoreboard();
 
         String teamName = playerTeamNames.computeIfAbsent(player.getUniqueId(), u -> makeTeamName(player));
         Team team = sb.getTeam(teamName);
         if (team == null) team = sb.registerNewTeam(teamName);
 
-        // Формат: [Ранг] Имя | Очки⭐ | Баланс💰
-        // prefix = "[Ранг] "
-        // suffix = " | Очки⭐ | Баланс💰"
-        String prefix = plugin.getConfig().getString("tab.prefix", "&7[%rank_name%&7] &f");
-        String suffix = plugin.getConfig().getString("tab.suffix",
-                " &7| &e%points%⭐ &7| &6%balance%💰");
+        // ранги
+        String rankDisplay = getRankDisplay(player);
 
-        // rank display (то что у тебя в config ranks.<id>.display)
-        String rankName = getRankDisplay(player);
+        // очки (из DataManager)
+        int pts = plugin.getDataManager().getPoints(player.getUniqueId().toString());
 
-        // points + balance (берём из DataManager/EconomyManager, не через плейсхолдеры, чтобы 100% работало)
-        String points = String.valueOf(plugin.getDataManager().getPoints(player.getUniqueId().toString()));
-        String balance = plugin.formatMoney(plugin.getEconomyManager().getBalance(player)) + plugin.getCurrencySymbol();
+        // деньги (из EconomyManager)
+        String bal = plugin.formatMoney(plugin.getEconomyManager().getBalance(player)) + plugin.getCurrencySymbol();
 
-        prefix = prefix.replace("%rank_name%", rankName);
-        suffix = suffix.replace("%rank_name%", rankName);
+        // формат (можешь менять цвета в config.yml)
+        String prefix = plugin.getConfig().getString("tab.prefix", "&7[" + rankDisplay + "&7] &f");
+        String suffix = plugin.getConfig().getString("tab.suffix", " &7| &e" + pts + "⭐ &7| &6" + bal + "💰");
 
-        suffix = suffix.replace("%points%", points);
-        suffix = suffix.replace("%balance%", balance);
+        // поддержка плейсхолдеров в конфиге (если ты поставишь %rank_name% / %points% / %balance%)
+        prefix = prefix.replace("%rank_name%", rankDisplay);
+        suffix = suffix.replace("%rank_name%", rankDisplay);
 
-        // на всякий случай — если где-то в конфиге стоят placeholders
+        suffix = suffix.replace("%points%", String.valueOf(pts));
+        suffix = suffix.replace("%balance%", bal);
+
+        // и ещё прогон через replacePlaceholders (на будущее)
         prefix = plugin.replacePlaceholders(player, prefix);
         suffix = plugin.replacePlaceholders(player, suffix);
 
-        // защита от длинных строк
         team.setPrefix(color(cut(prefix, 64)));
         team.setSuffix(color(cut(suffix, 64)));
 
@@ -83,6 +84,7 @@ public class TabManager {
     }
 
     private String makeTeamName(Player player) {
+        // team name must be <= 16
         String base = "bc" + Integer.toHexString(player.getUniqueId().hashCode());
         if (base.length() > 16) base = base.substring(0, 16);
         return base;
