@@ -17,11 +17,9 @@ tab:
   enabled: true
   update-interval-seconds: 2
 
-  # то, что слева от ника
-  prefix: "%gender_prefix% %rank_prefix%"
-
-  # то, что справа от ника (СВЕРХУ) -> ОЧКИ
-  suffix: " &7| &eОчки: &a%businesscore_points%"
+  # Формат: [Ранг] Имя | Очки⭐ | Баланс💰
+  prefix: "&7[%rank_name%&7] &f"
+  suffix: " &7| &e%points%⭐ &7| &6%balance%💰"
 
   # верх TAB (можешь оставить просто BUSINESSCORE)
   header: "&6&lBUSINESSCORE"
