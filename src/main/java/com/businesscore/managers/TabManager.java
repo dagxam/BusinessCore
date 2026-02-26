@@ -62,16 +62,15 @@ public class TabManager {
 
         // формат (можешь менять цвета в config.yml)
         String prefix = plugin.getConfig().getString("tab.prefix", "&7[" + rankDisplay + "&7] &f");
-        String suffix = plugin.getConfig().getString("tab.suffix", " &7| &e" + pts + "⭐ &7| &6" + bal + "💰");
+        String suffix = plugin.getConfig().getString("tab.suffix", " &7| &e%points%⭐ &7| &6%balance%💰");
 
-        // поддержка плейсхолдеров в конфиге (если ты поставишь %rank_name% / %points% / %balance%)
+        // поддержка плейсхолдеров в конфиге
         prefix = prefix.replace("%rank_name%", rankDisplay);
         suffix = suffix.replace("%rank_name%", rankDisplay);
 
         suffix = suffix.replace("%points%", String.valueOf(pts));
         suffix = suffix.replace("%balance%", bal);
 
-        // и ещё прогон через replacePlaceholders (на будущее)
         prefix = plugin.replacePlaceholders(player, prefix);
         suffix = plugin.replacePlaceholders(player, suffix);
 
@@ -81,10 +80,13 @@ public class TabManager {
         if (!team.hasEntry(player.getName())) {
             team.addEntry(player.getName());
         }
+
+        // --- ВАЖНО: Устанавливаем прямо в TAB, чтобы избежать конфликтов и обрезаний ---
+        String tabName = prefix + player.getName() + suffix;
+        player.setPlayerListName(color(tabName));
     }
 
     private String makeTeamName(Player player) {
-        // team name must be <= 16
         String base = "bc" + Integer.toHexString(player.getUniqueId().hashCode());
         if (base.length() > 16) base = base.substring(0, 16);
         return base;
