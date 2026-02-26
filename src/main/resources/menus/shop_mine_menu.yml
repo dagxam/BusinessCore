@@ -20,6 +20,89 @@ items:
       - '&fУ вас: &6%skript_balance%%currency%'
     slot: 4
 
+  # === ТОВАРЫ ===
+  sell_coal:
+    material: COAL
+    amount: 64
+    display_name: '&8Уголь'
+    lore:
+      - ''
+      - '&7Сдать &fx64 &7угля'
+      - '&7Выручка: &a+150%currency%'
+      - ''
+      - '&eЛКМ &8- &7Продать стак'
+      - '&6ПКМ &8- &7Продать всё'
+    slot: 20
+    left_click_commands:
+      - '[player] skript-sell COAL 64 150'
+    right_click_commands:
+      - '[player] skript-sellall COAL 64 150'
+
+  sell_iron:
+    material: IRON_INGOT
+    amount: 64
+    display_name: '&fЖелезный слиток'
+    lore:
+      - ''
+      - '&7Сдать &fx64 &7железа'
+      - '&7Выручка: &a+350%currency%'
+      - ''
+      - '&eЛКМ &8- &7Продать стак'
+      - '&6ПКМ &8- &7Продать всё'
+    slot: 21
+    left_click_commands:
+      - '[player] skript-sell IRON_INGOT 64 350'
+    right_click_commands:
+      - '[player] skript-sellall IRON_INGOT 64 350'
+
+  sell_gold:
+    material: GOLD_INGOT
+    amount: 64
+    display_name: '&eЗолотой слиток'
+    lore:
+      - ''
+      - '&7Сдать &fx64 &7золота'
+      - '&7Выручка: &a+500%currency%'
+      - ''
+      - '&eЛКМ &8- &7Продать стак'
+      - '&6ПКМ &8- &7Продать всё'
+    slot: 22
+    left_click_commands:
+      - '[player] skript-sell GOLD_INGOT 64 500'
+    right_click_commands:
+      - '[player] skript-sellall GOLD_INGOT 64 500'
+
+  sell_diamond:
+    material: DIAMOND
+    amount: 1
+    display_name: '&bАлмаз'
+    lore:
+      - ''
+      - '&7Сдать &fx1 &bалмаз'
+      - '&7Выручка: &a+150%currency%'
+      - ''
+      - '&eЛКМ &8- &7Продать 1 шт'
+      - '&6ПКМ &8- &7Продать всё из инвентаря'
+    slot: 23
+    left_click_commands:
+      - '[player] skript-sell DIAMOND 1 150'
+    right_click_commands:
+      - '[player] skript-sellall DIAMOND 1 150'
+
+  buy_pickaxe:
+    material: DIAMOND_PICKAXE
+    display_name: '&bАлмазная кирка'
+    lore:
+      - ''
+      - '&7Профессиональный инструмент.'
+      - '&7Цена: &c-2000%currency%'
+      - ''
+      - '&aНажми, чтобы купить'
+    slot: 25
+    click_commands:
+      - '[player] skript-buy DIAMOND_PICKAXE 1 2000'
+
+  # === НАВИГАЦИЯ ===
   back_to_main:
     material: ARROW
     display_name: '&e&l← ГЛАВНОЕ МЕНЮ'
