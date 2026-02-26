@@ -20,8 +20,6 @@ import static com.businesscore.BusinessCore.color;
 public class PlayerListener implements Listener {
 
     private final BusinessCore plugin;
-
-    // антиспам открытия меню (на игрока)
     private final Map<UUID, Long> genderCooldown = new HashMap<>();
 
     public PlayerListener(BusinessCore plugin) {
@@ -35,10 +33,8 @@ public class PlayerListener implements Listener {
         EconomyManager eco = plugin.getEconomyManager();
         String uuid = player.getUniqueId().toString();
 
-        // init mapping name
         dm.setMoneyName(uuid, player.getName());
 
-        // first join money
         if (dm.isFirstJoin(uuid)) {
             dm.markJoined(uuid);
 
@@ -60,19 +56,17 @@ public class PlayerListener implements Listener {
 
         dm.setOpState(uuid, player.isOp() ? 1 : 0);
 
-        // rank check
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (player.isOnline()) plugin.getRankManager().checkRankUp(player);
         }, 20L);
 
-        // apply skin if already selected
+        // apply skin if already selected using DataManager instead of permissions
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (player.isOnline() && player.hasPermission("gender.selected")) {
+            if (player.isOnline() && !plugin.getDataManager().getPlayerGender(uuid).equals("none")) {
                 plugin.getGenderManager().setSkinByGroup(player);
             }
         }, 60L);
 
-        // render tab later
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (player.isOnline()) plugin.getTabManager().updatePlayer(player);
         }, 40L);
@@ -90,23 +84,20 @@ public class PlayerListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        // только если реально сдвинулся, а не повернул голову
         if (event.getFrom().getBlockX() == event.getTo().getBlockX()
                 && event.getFrom().getBlockY() == event.getTo().getBlockY()
                 && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
             return;
         }
 
-        // уже выбран пол — ничего
-        if (player.hasPermission("gender.selected")) return;
+        // Надежная проверка через DataManager (игнорирует OP права)
+        if (!plugin.getDataManager().getPlayerGender(player.getUniqueId().toString()).equals("none")) return;
 
-        // если меню уже открыто — не открываем снова
         if (plugin.getMenuManager().getOpenSession(player.getUniqueId()) != null) return;
 
         long now = System.currentTimeMillis();
         UUID uid = player.getUniqueId();
 
-        // антиспам 3 секунды
         if (genderCooldown.containsKey(uid) && now - genderCooldown.get(uid) < 3000) return;
         genderCooldown.put(uid, now);
 
