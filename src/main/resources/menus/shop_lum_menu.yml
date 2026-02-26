@@ -20,6 +20,72 @@ items:
       - '&fУ вас: &6%skript_balance%%currency%'
     slot: 4
 
+  # === ТОВАРЫ ===
+  sell_oak:
+    material: OAK_LOG
+    amount: 64
+    display_name: '&aДубовое бревно'
+    lore:
+      - ''
+      - '&7Сдать &fx64 &7дуба'
+      - '&7Выручка: &a+320%currency%'
+      - ''
+      - '&eЛКМ &8- &7Продать стак (64 шт)'
+      - '&6ПКМ &8- &7Продать всё из инвентаря'
+    slot: 20
+    left_click_commands:
+      - '[player] skript-sell OAK_LOG 64 320'
+    right_click_commands:
+      - '[player] skript-sellall OAK_LOG 64 320'
+
+  sell_spruce:
+    material: SPRUCE_LOG
+    amount: 64
+    display_name: '&aЕловое бревно'
+    lore:
+      - ''
+      - '&7Сдать &fx64 &7ели'
+      - '&7Выручка: &a+320%currency%'
+      - ''
+      - '&eЛКМ &8- &7Продать стак (64 шт)'
+      - '&6ПКМ &8- &7Продать всё из инвентаря'
+    slot: 21
+    left_click_commands:
+      - '[player] skript-sell SPRUCE_LOG 64 320'
+    right_click_commands:
+      - '[player] skript-sellall SPRUCE_LOG 64 320'
+
+  sell_birch:
+    material: BIRCH_LOG
+    amount: 64
+    display_name: '&aБерезовое бревно'
+    lore:
+      - ''
+      - '&7Сдать &fx64 &7березы'
+      - '&7Выручка: &a+320%currency%'
+      - ''
+      - '&eЛКМ &8- &7Продать стак (64 шт)'
+      - '&6ПКМ &8- &7Продать всё из инвентаря'
+    slot: 22
+    left_click_commands:
+      - '[player] skript-sell BIRCH_LOG 64 320'
+    right_click_commands:
+      - '[player] skript-sellall BIRCH_LOG 64 320'
+
+  buy_axe:
+    material: DIAMOND_AXE
+    display_name: '&bАлмазный топор'
+    lore:
+      - ''
+      - '&7Мощный инструмент лесоруба.'
+      - '&7Цена: &c-1500%currency%'
+      - ''
+      - '&aНажми, чтобы купить 1 шт.'
+    slot: 24
+    click_commands:
+      - '[player] skript-buy DIAMOND_AXE 1 1500'
+
+  # === НАВИГАЦИЯ ===
   back_to_main:
     material: ARROW
     display_name: '&e&l← ГЛАВНОЕ МЕНЮ'
